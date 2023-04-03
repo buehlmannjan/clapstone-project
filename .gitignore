@@ -4,4 +4,4 @@
 .Ruserdata
 
 # ignore .Rproj files
-* Rproj
+*.Rproj
