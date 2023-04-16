@@ -1,6 +1,6 @@
 ###################################################################
 # Class Exercise 2
-# Sascha Eng & Ursulina Kölbener
+# Sascha Eng & Ursulina Kölbener & Jan Bühlmann
 ###################################################################
 
 # 1. install and load packages ----
