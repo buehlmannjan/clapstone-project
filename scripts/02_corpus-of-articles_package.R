@@ -1,8 +1,7 @@
 ###################################################################
 # Class Exercise 2
-# Sascha Eng & Ursulina Kölbener & Jan Bühlmann
+# Jan Bühlmann, Sascha Eng & Ursulina Kölbener
 ###################################################################
-
 
 # 1. install and load packages ----
 install.packages("httr")
@@ -28,7 +27,7 @@ options(gu.API.key = api_key)
 devtools::install_github("evanodell/guardianapi")
 library(guardianapi)
 
-# 3. define the search function for The Guardian API
+# 3. define the search function for The Guardian API ----
 chatgpt <- gu_content(query = "chatgpt", from_date = "2018-12-01",
                             to_date = "2023-04-17")
 
