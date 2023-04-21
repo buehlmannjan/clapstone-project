@@ -17,6 +17,83 @@ The development of programs that attempt to imitate the human brain is nothing r
 
 <br>
 
-## Methods
+## Data and Methods
 
-**Data and Methods**
+We aim to use the Guardian API to scrape for articles mentioning "OpenAI or ChatGPT" between December 1st, 2018 and April 17th, 2023.
+
+**Data collection and Preprocessing**
+
+After saving a personal API key and defining a search function for The Guardian API we apply our function to get articles that mention “openAI OR chatGPT” between December 1st, 2018 and April 17th, 2023. The code then prints the resulting data frame and displays its structure and summary statistics for numeric columns. It also simplifies the dataframe by removing liveblogs and selecting specified columns. Finally, it saves our dataframe as a csv file. With this done, we have prepared our dataset for further preparations.
+
+```{r}
+# 1. install and load packages ----
+# install.packages("httr")
+# install.packages("jsonlite")
+# install.packages("devtools") 
+# install.packages("tm")
+# yeyinstall.packages("stringr")
+# install.packages("ggplot2")
+
+library(httr)
+library(jsonlite)
+library(tidyverse)
+library(devtools)
+library(ggplot2)
+library(lubridate)
+
+# install.packages("devtools")
+# devtools::install_github("evanodell/guardianapi")
+library(guardianapi)
+
+# 2. save personal API key ----
+api_key <- rstudioapi::askForPassword('Enter your API key:')
+options(gu.API.key = api_key)
+
+# make sure the key is not pushed to github
+
+# 3. define the search function for The Guardian API ----
+articles <- gu_content(query = "openAI OR chatGPT", from_date = "2018-12-01",
+                            to_date = "2023-04-17")
+
+print(articles)
+head(articles)
+colnames(articles)
+
+# 4. simplify dataframe
+df_articles <- articles %>%
+  filter(type == "article") %>% # remove liveblogs
+  select(id, section_name, web_publication_date, web_title, headline, byline, pillar_name, body_text, wordcount)
+
+# save dataframe
+data.table::fwrite(df_articles, here::here("data", "df_articles.csv"))
+
+
+# 5. Display the structure of the dataset ----
+str(articles)
+
+# a) Generate summary statistics for numeric columns
+summary(articles)
+
+```
+
+<br>
+
+**Text Analytics**
+
+We now apply the quanteda library to create a corpus from the initial dataset. For that the articles are sequenced and given individual names which are connected to the articles id's and are linked to an index.
+
+```{r}
+# 1. preparations ----
+install.packages("quanteda")
+
+library(quanteda)
+
+# load dataframe
+df_articles <- data.table::fread(here::here("data", "df_articles.csv"))
+
+# create unique document names
+docnames <- paste(df_articles$id, seq_along(df_articles$id), sep = "_")
+
+# 2. create a corpus wit the main texts ----
+corp_main <- corpus(df_articles$body_text, docnames = docnames)
+```
