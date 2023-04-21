@@ -1,7 +1,7 @@
 ---
-title: "report"
-author: "Es"
-date: "`r Sys.Date()`"
+title: "Analyzing the sentiment of OpenAI displayed in Guardian articles"
+author: "Ursulina Kölbener, Jan Bühlmann und Sascha Eng"
+date: "2023-04-21"
 output: html_document
 ---
 
@@ -9,22 +9,222 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+<br>
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Introduction
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+The development of programs that attempt to imitate the human brain is nothing recent. AI's have been a dream of a meany researcher for many years. While it already had a significant presence in science fiction literature, it's real world counterpart only recently garnered a broad attention in news media and the public. This project aims to track that change in awareness by initially observing the frequency of mentions of AI related keywords (specifically surrounding ChatGPT and OpenAI). In a second step a simple analysis of sentiment of the scraped articles is to be made. For this purpose we access the Guardian API and the considerable archive of published articles.
 
-```{r cars}
-summary(cars)
+The initial draft was made using notions. The file in question can be found under the following link: https://janbuehlmann.notion.site/CE2-5359602686be4ca5932b434da4470119
+
+<br>
+
+## Data and Methods
+
+**Data collection and Preprocessing**
+
+After saving a personal API key and defining a search function for The Guardian API we apply our function to get articles that mention "openAI OR chatGPT" between December 1st, 2018 and April 17th, 2023. The code then prints the resulting data frame and displays its structure and summary statistics for numeric columns. It also simplifies the dataframe by removing liveblogs and selecting specified columns. Finally, it saves our dataframe as a csv file. With this done, we have prepared our dataset for further preparations.
+
+```{}
+# 1. install and load packages ----
+# install.packages("httr")
+# install.packages("jsonlite")
+# install.packages("devtools") 
+# install.packages("tm")
+# yeyinstall.packages("stringr")
+# install.packages("ggplot2")
+
+library(httr)
+library(jsonlite)
+library(tidyverse)
+library(devtools)
+library(ggplot2)
+library(lubridate)
+
+# install.packages("devtools")
+# devtools::install_github("evanodell/guardianapi")
+library(guardianapi)
+
+# 2. save personal API key ----
+api_key <- rstudioapi::askForPassword('Enter your API key:')
+options(gu.API.key = api_key)
+
+# make sure the key is not pushed to github
+
+# 3. define the search function for The Guardian API ----
+articles <- gu_content(query = "openAI OR chatGPT", from_date = "2018-12-01",
+                            to_date = "2023-04-17")
+
+print(articles)
+head(articles)
+colnames(articles)
+
+# 4. simplify dataframe
+df_articles <- articles %>%
+  filter(type == "article") %>% # remove liveblogs
+  select(id, section_name, web_publication_date, web_title, headline, byline, pillar_name, body_text, wordcount)
+
+# save dataframe
+data.table::fwrite(df_articles, here::here("data", "df_articles.csv"))
+
+
+# 5. Display the structure of the dataset ----
+str(articles)
+
+# a) Generate summary statistics for numeric columns
+summary(articles)
+
 ```
 
-## Including Plots
+<br>
 
-You can also embed plots, for example:
+**Text Analytics**
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+We now apply the quanteda library to create a corpus from the initial dataset. For that the articles are sequenced and given individual names which are connected to the articles id's and are linked to an index.
+
+```{}
+# 1. preparations ----
+#install.packages("quanteda")
+
+library(quanteda)
+
+# load dataframe
+df_articles <- data.table::fread(here::here("data", "df_articles.csv"))
+
+# create unique document names
+docnames <- paste(df_articles$id, seq_along(df_articles$id), sep = "_")
+
+# 2. create a corpus wit the main texts ----
+corp_main <- corpus(df_articles$body_text, docnames = docnames)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+<br>
+
+#### Frequency Analysis
+
+With all the preparations done the first analysis can be implemented. With the help of lubridate and ggplot2 we calculate the frequency of articles by month and plot the distribution of publication dates using ggplot2.
+
+```{}
+# Load necessary libraries
+library(ggplot2)
+library(lubridate)
+
+
+# Calculate the frequency of articles by month
+articles$month <- floor_date(articles$web_publication_date, "month")
+monthly_counts <- as.data.frame(table(articles$month))
+
+
+# Plot the distribution of publication dates
+plot_1 <- ggplot(monthly_counts, aes(x = Var1, y = Freq)) +
+  geom_col() +
+  labs(x = "Publication Month", y = "Frequency", title = "Distribution of Articles Publication Dates") +
+  theme_minimal()
+
+print(monthly_counts)
+
+# save plot
+ggsave(here::here("figs", "plot 1_dist articles.png"), plot_1)
+```
+
+![](figs/plot 1_dist articles.png)
+
+<br>
+
+#### Sentiment Analysis
+
+Finally we again clean the dataset for our finale analysis. This is twofolded. First we tokenize the words, remove stopwords and finally count the frequency of words in the dataset. This allows us to visualize the top 10 most frequent words in the articles. With this information we then calculate daily average sentiment scores for the various articles, and visualizes daily average sentiment scores for articles
+
+```{}
+# 1. Preprocessing ----
+
+# install.packages("syuzhet")
+#library(syuzhet)
+
+# Load necessary libraries
+library(tidytext)
+library(dplyr)
+library(stringr)
+library(tm)
+library(lubridate)
+
+## a. Clean the text data.
+
+# Define the cleaning function
+clean_text <- function(text) {
+  cleaned_text <- str_replace_all(text, "<[^>]*>", "") # Remove HTML tags
+  cleaned_text <- gsub("[^[:alnum:]///' ]", "", cleaned_text) # Remove special characters
+  return(cleaned_text)
+}
+
+# Print the column names of the dataset
+colnames(articles)
+
+# Apply the cleaning function to the bodytext column
+articles$body_text_cleaned <- clean_text(articles$body_text)
+
+## b. Tokenize the words.
+
+# Tokenize the words
+chatgpt_tidy <- articles %>%
+  unnest_tokens(word, body_text_cleaned)
+
+## c. Remove stopwords.
+
+# Load the stopwords
+data("stop_words")
+
+# Remove stopwords
+chatgpt_tidy <- chatgpt_tidy %>%
+  anti_join(stop_words)
+
+## d. Count the frequency of words.
+
+word_counts <- chatgpt_tidy %>%
+  count(word, sort = TRUE)
+
+## e. Visualize the most frequent words.
+
+# Plot the top 10 most frequent words
+plot_2 <- word_counts %>%
+  top_n(10) %>%
+  ggplot(aes(x = reorder(word, n), y = n)) +
+  geom_col() +
+  coord_flip() +
+  labs(x = "Words", y = "Frequency", title = "Top 10 Most Frequent Words") +
+  theme_minimal()
+
+# save plot
+ggsave(here::here("figs", "plot 2_top 10 words.png"), plot_2)
+
+# 2. Calculate daily average sentiment ----
+# Assuming chatgpt_sentiment has a date column named 'date'
+
+# Calculate sentiment scores
+chatgpt_sentiment <- articles %>%
+  select(web_publication_date, body_text_cleaned) %>%
+  mutate(sentiment = get_sentiment(body_text_cleaned, method = "nrc")) %>%
+  mutate(date = floor_date(web_publication_date, "day")) %>%
+  group_by(date) %>%
+  summarize(avg_sentiment = mean(sentiment))
+
+plot_3 <- ggplot(chatgpt_sentiment, aes(x = date, y = avg_sentiment)) +
+  geom_line() +
+  labs(x = "Date", y = "Average Sentiment", title = "Daily Average Sentiment of Articles") +
+  theme_minimal()
+
+# save plot
+ggsave(here::here("figs", "plot 3_avg sentiment.png"), plot_3)
+
+```
+
+![](figs/plot 2_top 10 words.png)
+![](figs/plot 3_avg sentiment.png)
+
+<br>
+
+#### Conclusion
+
+Our analysis reveals that we can observe a significant uptick in articles since the OpenAI released ChatGPT for public access. The graph also clearly indicates a wider public interest in the topic of AI since this release.
+Further we can show that with the initial publications sentiments did vary widely and then developed towards a more stable and consistent sentiment as time progressed. It should be noted, that European countries are usually more critical towards synthetic technologies that are made human like or in human image. As such a consistent but slightly wary sentiment is to be expexted. Nonetheless the impact of ChatGPT was clearly felt in the Guardians publications.
+
