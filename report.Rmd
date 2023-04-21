@@ -1,7 +1,7 @@
 ---
-title: "report"
-author: "Es"
-date: "`r Sys.Date()`"
+title: "Analyzing the sentiment of OpenAI displayed in Guardian articles"
+author: "Ursulina Kölbener, Jan Bühlmann und Sascha Eng"
+date: "2023-04-21"
 output: html_document
 ---
 
@@ -9,22 +9,14 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+<br>
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Introduction
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+The development of programs that attempt to imitate the human brain is nothing recent. AI's have been a dream of a meany researcher for many years. While it already had a significant presence in science fiction literature, it's real world counterpart only recently garnered a broad attention in news media and the public. This project aims to track that change in awareness by initially observing the frequency of mentions of AI related keywords (specifically surrounding ChatGPT and OpenAI). In a second step a simple analysis of sentiment of the scraped articles is to be made. For this purpose we access the Guardian API and the considerable archieve of published articles.
 
-```{r cars}
-summary(cars)
-```
+<br>
 
-## Including Plots
+## Methods
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+**Data and Methods**
