@@ -9,10 +9,9 @@
 # install.packages("devtools") 
 # install.packages("tm")
 # yeyinstall.packages("stringr")
-install.packages("ggplot2")
+# install.packages("ggplot2")
 
-
-#library(httr)
+library(httr)
 library(jsonlite)
 library(tidyverse)
 library(devtools)
@@ -37,31 +36,20 @@ print(articles)
 head(articles)
 colnames(articles)
 
+# 4. simplify dataframe
+df_articles <- articles %>%
+  filter(type == "article") %>% # remove liveblogs
+  select(id, section_name, web_publication_date, web_title, headline, byline, pillar_name, body_text, wordcount)
 
-# 4. Display the structure of the dataset
-str(chatgpt)
+# save dataframe
+data.table::fwrite(df_articles, here::here("data", "df_articles.csv"))
+
+
+# 5. Display the structure of the dataset ----
+str(articles)
 
 # a) Generate summary statistics for numeric columns
-summary(chatgpt)
-
-
-# b) Load necessary libraries
-library(ggplot2)
-library(lubridate)
-
-
-# c) Calculate the frequency of articles by month
-chatgpt$month <- floor_date(chatgpt$web_publication_date, "month")
-monthly_counts <- as.data.frame(table(chatgpt$month))
-
-
-# d) Plot the distribution of publication dates
-ggplot(monthly_counts, aes(x = Var1, y = Freq)) +
-  geom_col() +
-  labs(x = "Publication Month", y = "Frequency", title = "Distribution of Article Publication Dates") +
-  theme_minimal()
-
-print(monthly_counts)
+summary(articles)
 
 # 5. Preprocessing
 ## a. Clean the text data.
