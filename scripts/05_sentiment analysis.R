@@ -51,7 +51,7 @@ word_counts <- chatgpt_tidy %>%
 ## e. Visualize the most frequent words.
 
 # Plot the top 10 most frequent words
-word_counts %>%
+plot_2 <- word_counts %>%
   top_n(10) %>%
   ggplot(aes(x = reorder(word, n), y = n)) +
   geom_col() +
@@ -59,7 +59,8 @@ word_counts %>%
   labs(x = "Words", y = "Frequency", title = "Top 10 Most Frequent Words") +
   theme_minimal()
 
-
+# save plot
+ggsave(here::here("figs", "plot 2_top 10 words.png"), plot_2)
 
 # 2. Calculate daily average sentiment ----
 # Assuming chatgpt_sentiment has a date column named 'date'
