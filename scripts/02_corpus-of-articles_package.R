@@ -4,11 +4,11 @@
 ###################################################################
 
 # 1. install and load packages ----
-install.packages("httr")
-install.packages("jsonlite")
-install.packages("devtools") 
-install.packages("tm")
-yeyinstall.packages("stringr")
+# install.packages("httr")
+# install.packages("jsonlite")
+# install.packages("devtools") 
+# install.packages("tm")
+# yeyinstall.packages("stringr")
 
 library(httr)
 library(jsonlite)
@@ -24,7 +24,7 @@ options(gu.API.key = api_key)
 # make sure the key is not pushed to github
 
 # install.packages("devtools")
-devtools::install_github("evanodell/guardianapi")
+# devtools::install_github("evanodell/guardianapi")
 library(guardianapi)
 
 # 3. define the search function for The Guardian API ----
