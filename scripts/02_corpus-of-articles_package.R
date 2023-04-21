@@ -38,6 +38,14 @@ colnames(articles)
 # Display the structure of the dataset
 str(articles)
 
+# 4. simplify dataframe
+df_articles <- articles %>%
+  filter(type == "article") %>% # remove liveblogs
+  select(id, section_name, web_publication_date, web_title, headline, byline, pillar_name, body_text, wordcount, star_rating)
+
+# save dataframe
+data.table::fwrite(df_articles, here::here("data", "df_articles.csv"))
+
 # 5. Summary statistics ----
 # Generate summary statistics for numeric columns
 summary(articles)
