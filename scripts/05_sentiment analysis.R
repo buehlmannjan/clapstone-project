@@ -7,11 +7,15 @@
 
 # 1. Preprocessing ----
 
+# install.packages("syuzhet")
+library(syuzhet)
+
 # Load necessary libraries
 library(tidytext)
 library(dplyr)
 library(stringr)
 library(tm)
+library(lubridate)
 
 ## a. Clean the text data.
 
@@ -64,10 +68,6 @@ ggsave(here::here("figs", "plot 2_top 10 words.png"), plot_2)
 
 # 2. Calculate daily average sentiment ----
 # Assuming chatgpt_sentiment has a date column named 'date'
-library(lubridate)
-
-# install.packages("syuzhet")
-library(syuzhet)
 
 # Calculate sentiment scores
 chatgpt_sentiment <- articles %>%
@@ -77,7 +77,10 @@ chatgpt_sentiment <- articles %>%
   group_by(date) %>%
   summarize(avg_sentiment = mean(sentiment))
 
-ggplot(chatgpt_sentiment, aes(x = date, y = avg_sentiment)) +
+plot_3 <- ggplot(chatgpt_sentiment, aes(x = date, y = avg_sentiment)) +
   geom_line() +
   labs(x = "Date", y = "Average Sentiment", title = "Daily Average Sentiment of Articles") +
   theme_minimal()
+
+# save plot
+ggsave(here::here("figs", "plot 3_avg sentiment.png"), plot_3)
