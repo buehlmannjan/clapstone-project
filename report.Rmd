@@ -13,7 +13,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-The development of programs that attempt to imitate the human brain is nothing recent. AI's have been a dream of a meany researcher for many years. While it already had a significant presence in science fiction literature, it's real world counterpart only recently garnered a broad attention in news media and the public. This project aims to track that change in awareness by initially observing the frequency of mentions of AI related keywords (specifically surrounding ChatGPT and OpenAI). In a second step a simple analysis of sentiment of the scraped articles is to be made. For this purpose we access the Guardian API and the considerable archieve of published articles.
+The development of programs that attempt to imitate the human brain is nothing recent. AI's have been a dream of a meany researcher for many years. While it already had a significant presence in science fiction literature, it's real world counterpart only recently garnered a broad attention in news media and the public. This project aims to track that change in awareness by initially observing the frequency of mentions of AI related keywords (specifically surrounding ChatGPT and OpenAI). In a second step a simple analysis of sentiment of the scraped articles is to be made. For this purpose we access the Guardian API and the considerable archive of published articles.
+
+The initial draft was made using notions. The file in question can be found under the following link: https://janbuehlmann.notion.site/CE2-5359602686be4ca5932b434da4470119
 
 <br>
 
@@ -125,6 +127,8 @@ print(monthly_counts)
 ggsave(here::here("figs", "plot 1_dist articles.png"), plot_1)
 ```
 
+![](figs/plot 1_dist articles.png)
+
 <br>
 
 #### Sentiment Analysis
@@ -213,6 +217,9 @@ plot_3 <- ggplot(chatgpt_sentiment, aes(x = date, y = avg_sentiment)) +
 ggsave(here::here("figs", "plot 3_avg sentiment.png"), plot_3)
 
 ```
+
+![](figs/plot 2_top 10 words.png)
+![](figs/plot 3_avg sentiment.png)
 
 <br>
 
