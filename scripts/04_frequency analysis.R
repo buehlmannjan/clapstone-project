@@ -16,9 +16,12 @@ monthly_counts <- as.data.frame(table(articles$month))
 
 
 # Plot the distribution of publication dates
-ggplot(monthly_counts, aes(x = Var1, y = Freq)) +
+plot_1 <- ggplot(monthly_counts, aes(x = Var1, y = Freq)) +
   geom_col() +
-  labs(x = "Publication Month", y = "Frequency", title = "Distribution of Article Publication Dates") +
+  labs(x = "Publication Month", y = "Frequency", title = "Distribution of Articles Publication Dates") +
   theme_minimal()
 
 print(monthly_counts)
+
+# save plot
+ggsave(here::here("figs", "plot 1_dist articles.png"), plot_1)
