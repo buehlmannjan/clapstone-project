@@ -39,3 +39,5 @@ df_articles <- data.frame(title = articles$response$results$webTitle,
                           section = articles$response$results$sectionName,
                           url = articles$response$results$webUrl,
                           date = articles$response$results$webPublicationDate)
+
+# With the API package (see script 2) it is possible to get the main text in the same request.
