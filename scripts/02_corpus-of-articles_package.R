@@ -17,37 +17,38 @@ library(devtools)
 library(ggplot2)
 library(lubridate)
 
+# install.packages("devtools")
+# devtools::install_github("evanodell/guardianapi")
+library(guardianapi)
+
 # 2. save personal API key ----
 api_key <- rstudioapi::askForPassword('Enter your API key:')
 options(gu.API.key = api_key)
 
 # make sure the key is not pushed to github
 
-# install.packages("devtools")
-# devtools::install_github("evanodell/guardianapi")
-library(guardianapi)
-
 # 3. define the search function for The Guardian API ----
-chatgpt <- gu_content(query = "chatgpt", from_date = "2018-12-01",
+articles <- gu_content(query = "openAI OR chatGPT", from_date = "2018-12-01",
                             to_date = "2023-04-17")
 
-print(chatgpt)
-head(chatgpt)
-colnames(chatgpt)
+print(articles)
+head(articles)
+colnames(articles)
 
 # Display the structure of the dataset
-str(chatgpt)
+str(articles)
 
+# 5. Summary statistics ----
 # Generate summary statistics for numeric columns
-summary(chatgpt)
+summary(articles)
 
 # Load necessary libraries
 library(ggplot2)
 library(lubridate)
 
 # Calculate the frequency of articles by month
-chatgpt$month <- floor_date(chatgpt$web_publication_date, "month")
-monthly_counts <- as.data.frame(table(chatgpt$month))
+articles$month <- floor_date(articles$web_publication_date, "month")
+monthly_counts <- as.data.frame(table(articles$month))
 
 # Plot the distribution of publication dates
 ggplot(monthly_counts, aes(x = Var1, y = Freq)) +
@@ -55,9 +56,4 @@ ggplot(monthly_counts, aes(x = Var1, y = Freq)) +
   labs(x = "Publication Month", y = "Frequency", title = "Distribution of Article Publication Dates") +
   theme_minimal()
 
-
-
 print(monthly_counts)
-
-# 3. Preprocessing
-## a. Clean the text data.
