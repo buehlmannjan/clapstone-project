@@ -1,8 +1,6 @@
 # Data Mining Using R
-Class Exercise II from Sascha Eng, Ursulina Kölbener and Jan Bühlmann
+My Capstone Project for the FS23 Datamining in R Class
 
-## Our Plan
-Link to Notion File [...]
 
 ## Project Structure
 *scripts* folder for all the R scripts  

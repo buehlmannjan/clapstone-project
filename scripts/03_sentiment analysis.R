@@ -1,6 +1,6 @@
 ###################################################################
-# Class Exercise 2
-# Jan Bühlmann, Sascha Eng & Ursulina Kölbener
+# Clapstone Project
+# Jan Bühlmann
 ###################################################################
 
 ## SENTIMENT ANALYSIS

@@ -1,6 +1,6 @@
 ###################################################################
-# Class Exercise 2
-# Jan Bühlmann, Sascha Eng & Ursulina Kölbener
+# Clapstone Project
+# Jan Bühlmann
 ###################################################################
 
 # 1. install and load packages ----
@@ -30,7 +30,7 @@ options(gu.API.key = api_key)
 
 # 3. define the search function for The Guardian API ----
 articles <- gu_content(query = "openAI OR chatGPT", from_date = "2018-12-01",
-                            to_date = "2023-04-17")
+                            to_date = "2023-05-05")
 
 print(articles)
 head(articles)
